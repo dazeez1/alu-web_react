@@ -1,18 +1,36 @@
-import AppContext from '../App/AppContext';
-import Footer from "./Footer";
-import { render, screen } from "@testing-library/react";
+/**
+ * @jest-environment jsdom
+ */
 
+import React from 'react';
+import { shallow, mount } from 'enzyme';
+import Footer from './Footer';
+import { StyleSheetTestUtils } from 'aphrodite';
+import { loggedInContext, defaultUser } from '../utils/MockData';
+import { AppContext } from '../App/AppContext';
 
-describe("Footer", () => {
-    it("should render the footer element correctly when user is logged in", () => {
-        render(<AppContext.Provider value={{ user: {isLoggedIn: true} }}><Footer /> </AppContext.Provider>);
-        screen.getByText(/Copyright/i);
-        screen.getByText('contact us');
+beforeEach(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+});
+
+describe('<Footer />', () => {
+    it('renders an <Footer /> component', () => {
+        const wrapper = shallow(<Footer />);
+        expect(wrapper).toHaveLength(1);
     });
 
-    it("should render the footer element correctly when user is logged out", () => {
-        render(<AppContext.Provider value={{ user: {isLoggedIn: false} }}><Footer /> </AppContext.Provider>);
-        screen.getByText(/Copyright/i);
-        expect(screen.queryByText('contact us')).toBeNull();
+    it('renders an <Footer /> component checking for App-Footer', () => {
+        const wrapper = shallow(<Footer />);
+        expect(wrapper.find('div p').text()).toContain('Copyright');
     });
-})
+
+    it('verifies that the link is displayed when the user is logged in within the context', () => {
+        const wrapper = mount(<AppContext.Provider value={ loggedInContext }><Footer /></AppContext.Provider>);
+        expect(wrapper.find('div a')).toHaveLength(1);
+    });
+
+    it('verifies that the link is not displayed when the user is not logged in within the context', () => {
+        const wrapper = mount(<AppContext.Provider value={ defaultUser }><Footer /></AppContext.Provider>);
+        expect(wrapper.find('div a')).toHaveLength(0);
+    });
+});

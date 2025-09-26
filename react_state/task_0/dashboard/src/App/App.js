@@ -15,7 +15,22 @@ import { getLatestNotification } from '../utils/utils';
 class App extends React.Component {
   constructor(props) {
     super(props);
+    // State:
+    // - displayDrawer is a boolean controlling the view of the notifications
+    this.state = { displayDrawer: false };
+    this.handleDisplayDrawer = this.handleDisplayDrawer.bind(this);
+    this.handleHideDrawer = this.handleHideDrawer.bind(this);
     this.handleKeydown = this.handleKeydown.bind(this);
+  }
+
+  // Display the drawer when displayDrawer is true
+  handleDisplayDrawer() {
+    this.setState({ displayDrawer: true });
+  }
+
+  // Hide the drawer when displayDrawer is false
+  handleHideDrawer() {
+    this.setState({ displayDrawer: false });
   }
 
   // Lifecycle Methods
@@ -36,6 +51,7 @@ class App extends React.Component {
   }
 
   render() {
+    const { displayDrawer } = this.state;
     const { isLoggedIn, logOut } = this.props;
 
     const listCourses = [
@@ -52,7 +68,13 @@ class App extends React.Component {
 
     return (
       <>
-        <Notifications displayDrawer={ false } listNotifications={ listNotifications } />
+        <Notifications
+          displayDrawer={ displayDrawer }
+          listNotifications={ listNotifications }
+          // Pass functions by reference
+          handleDisplayDrawer={ this.handleDisplayDrawer }
+          handleHideDrawer={ this.handleHideDrawer }
+          />
         <div className="App">
           <Header />
           { isLoggedIn ?
@@ -60,12 +82,12 @@ class App extends React.Component {
               <CourseList listCourses={ listCourses } />
           </BodySectionWithMarginBottom>
            :
-          <BodySectionWithMarginBottom title="Log in to continue">
+          <BodySection title="Log in to continue">
             <Login />
-          </BodySectionWithMarginBottom>
+          </BodySection>
           }
           <BodySection title="News from the School">
-            <p>Graduation date is January 28th!</p>
+            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
           </BodySection>
           <Footer />
         </div>

@@ -1,116 +1,106 @@
-import React from "react";
-import Notifications from "../Notifications/Notifications";
-import Header from "../Header/Header";
-import Footer from "../Footer/Footer";
-import Login from "../Login/Login";
-import CourseList from "../CourseList/CourseList";
-import { getLatestNotifications } from "../utils/utils";
-import PropTypes from "prop-types";
-import BodySectionWithMarginBottom from "../BodySection/BodySectionWithMarginBottom";
-import BodySection from "../BodySection/BodySection";
-import { StyleSheet, css } from 'aphrodite';
-import AppContext, { user, logOut } from "./AppContext";
-
-export default class App extends React.Component {
-  listCourses = [
-    { id: 1, name: "ES6", credit: 60 },
-    { id: 2, name: "Webpack", credit: 20 },
-    { id: 3, name: "React", credit: 40 },
-  ];
-  listNotifications = [
-    { id: 1, type: "default", value: "New course available" },
-    { id: 2, type: "urgent", value: "New resume available" },
-    { id: 3, type: "urgent", html: getLatestNotifications() },
-  ];
-
-
+import React from 'react';
+import { hot } from 'react-hot-loader';
+import PropTypes from 'prop-types';
+import Header from '../Header/Header';
+import Login from '../Login/Login';
+import Footer from '../Footer/Footer';
+import Notifications from '../Notifications/Notifications';
+import CourseList from '../CourseList/CourseList';
+import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBottom';
+import BodySection from '../BodySection/BodySection';
+import { getLatestNotification } from '../utils/utils';
+import { user as defaultUser, AppContext } from './AppContext';
+class App extends React.Component {
   constructor(props) {
-    
     super(props);
-    this.logOut = this.logOut.bind(this);
+    // State:
+    // - displayDrawer is a boolean controlling the view of the notifications
+    // - user is a default user, no email/password or isLoggedIn
+    // - logOut is a function that sets the state to the default user
     this.state = {
       displayDrawer: false,
-      user,
-      logOut: this.logOut,
+      user: defaultUser,
+      logOut: () => {
+        this.setState({ user: defaultUser });
+      }
     };
     this.handleDisplayDrawer = this.handleDisplayDrawer.bind(this);
     this.handleHideDrawer = this.handleHideDrawer.bind(this);
+    this.handleKeydown = this.handleKeydown.bind(this);
     this.logIn = this.logIn.bind(this);
-    
-
   }
-  handleDisplayDrawer() {
-    this.setState({ displayDrawer: true });
-  }
-  handleHideDrawer() {
-    this.setState({ displayDrawer: false });
-  }
-
   logIn(email, password) {
     this.setState({ user: { email, password, isLoggedIn: true } });
   }
-
-  logOut() {
-    this.setState({ user });
+  // Handle Log out
+  handleKeydown(e) {
+    if (e.ctrlKey && e.key === 'h') {
+      alert('Logging you out');
+      this.state.logOut();
+    }
   }
-
-
-
-
+  // Display the drawer when displayDrawer is true
+  handleDisplayDrawer() {
+    this.setState({ displayDrawer: true });
+  }
+  // Hide the drawer when displayDrawer is false
+  handleHideDrawer() {
+    this.setState({ displayDrawer: false });
+  }
+  // Lifecycle Methods
   componentDidMount() {
-    window.addEventListener("keydown", (event) => {
-      if (event.ctrlKey && event.key === "h") {
-        alert("Logging you out");
-        this.props.logOut();
-      }
-    });
+    window.addEventListener('keydown', this.handleKeydown);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleKeydown);
   }
   render() {
-    const { displayDrawer, user } = this.state;
+    const { displayDrawer } = this.state;
+    const listCourses = [
+      { id: 1, name: 'ES6', credit: 60 },
+      { id: 2, name: 'Webpack', credit: 20 },
+      { id: 3, name: 'React', credit: 40 },
+    ];
+    const htmlObj = getLatestNotification();
+    const listNotifications = [
+      { id: 1, type: 'default', value: 'New course available' },
+      { id: 2, type: 'urgent', value: 'New course available' },
+      { id: 3, type: 'urgent', html: htmlObj },
+    ];
     return (
-      <AppContext.Provider value={this.state}>
-        <div className={css(styles.app)}>
+      <AppContext.Provider value={ { user: this.state.user, logOut: this.state.logOut } }>
+        <>
           <Notifications
-            displayDrawer={displayDrawer}
-            handleDisplayDrawer={this.handleDisplayDrawer}
-            handleHideDrawer={this.handleHideDrawer}
-            listNotifications={this.listNotifications}
+            displayDrawer={ displayDrawer }
+            listNotifications={ listNotifications }
+            // Pass functions by reference
+            handleDisplayDrawer={ this.handleDisplayDrawer }
+            handleHideDrawer={ this.handleHideDrawer }
           />
-          <Header />
-          <BodySectionWithMarginBottom title={this.isLoggedIn ? 'Course list' : "Log in to continue"}>
-            {user.isLoggedIn ? <CourseList listCourses={this.listCourses} /> : <Login logIn={this.logIn} />}
-          </BodySectionWithMarginBottom>
-          <BodySection title="News from the School">
-            <p>Latest school gossip</p>
-          </BodySection>
-          <Footer />
-        </div>
+          <div className="App">
+            <Header />
+            { this.state.user.isLoggedIn ?
+              <BodySectionWithMarginBottom title="Course list">
+                <CourseList listCourses={ listCourses } />
+              </BodySectionWithMarginBottom>
+              :
+              <BodySection title="Log in to continue">
+                <Login logIn={ this.logIn } />
+              </BodySection>
+            }
+            <BodySection title="News from the School">
+              <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+            </BodySection>
+            <Footer />
+          </div>
+        </>
       </AppContext.Provider>
     );
   }
 }
+App.propTypes = {
+};
+App.defaultProps = {
+};
 
-
-
-const styles = StyleSheet.create({
-  app: {
-    display: 'flex',
-    height: '100vh',
-    flexDirection: 'column',
-  },
-  body: {
-    textAlign: 'center',
-    fontSize: '18px',
-
-  },
-  footer: {
-    textAlign: 'center',
-    fontStyle: 'italic',
-    fontSize: '12px',
-    width: '100%',
-    backgroundColor: 'white',
-    borderTop: '1px solid black',
-  }
-});
-
-
+export default hot(module)(App);

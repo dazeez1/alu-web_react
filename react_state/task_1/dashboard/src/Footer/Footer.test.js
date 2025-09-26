@@ -1,11 +1,20 @@
-import Footer from "./Footer";
-import { render, screen } from "@testing-library/react";
+import React from 'react';
+import { shallow } from 'enzyme';
+import Footer from './Footer';
+import { StyleSheetTestUtils } from 'aphrodite';
 
+beforeEach(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+});
 
-describe("Footer", () => {
-    it("should render the footer element", () => {
-        render(<Footer />);
-        screen.getByText(/Copyright/i);
-
+describe('<Footer />', () => {
+    it('renders an <Footer /> component', () => {
+        const wrapper = shallow(<Footer />);
+        expect(wrapper).toHaveLength(1);
     });
-})
+
+    it('renders an <Footer /> component checking for App-Footer', () => {
+        const wrapper = shallow(<Footer />);
+        expect(wrapper.find('.App-footer p').text()).toContain('Copyright');
+    });
+});

@@ -1,33 +1,55 @@
-import React from "react";
-import Login from "./Login";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { StyleSheetTestUtils } from "aphrodite";
+/**
+ * @jest-environment jsdom
+ */
 
-StyleSheetTestUtils.suppressStyleInjection()
-describe("login", () => {
-    it("should render the login component", () => {
-        render(<Login />);
-        screen.getByTestId("email");
-        screen.getByTestId("password");
+import React from 'react';
+import { shallow, mount } from 'enzyme';
+import Login from './Login';
+import { StyleSheetTestUtils } from 'aphrodite';
 
-    })
+beforeEach(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+});
 
-    it("should disable the submit button when email or password is empty", () => {
-        render(<Login />);
-        const submitButton = screen.getByTestId("submit-button");
-        console.log(submitButton)
-        expect(submitButton).toHaveProperty('disabled', true);
+// Flush Promises allows simulate to finish changing component
+function flushPromises() {
+    return new Promise(resolve => setImmediate(resolve));
+}
 
-        // Simulate entering a value in the email input
-        const emailInput = screen.getByTestId("email");
-        fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-
-        expect(submitButton).toHaveProperty('disabled', true);
-
-        // Simulate entering a value in the password input
-        const passwordInput = screen.getByTestId("password");
-        fireEvent.change(passwordInput, { target: { value: "password123" } });
-
-        expect(submitButton).not.toHaveProperty('disabled', true);
+describe('<Login />', () => {
+    it('renders an <Login /> component checking for App-Login', () => {
+        const wrapper = shallow(<Login />);
+        expect(wrapper.find('#Login')).toHaveLength(1);
     });
-})
+
+    it('renders an <Login /> component checking for input', () => {
+        const wrapper = shallow(<Login />);
+        expect(wrapper.find('div input')).toHaveLength(3);
+    });
+
+    it('renders an <Login /> component checking for label', () => {
+        const wrapper = shallow(<Login />);
+        expect(wrapper.find('div label')).toHaveLength(2);
+    });
+
+    // Mounted component, ran change events, flushed promises, updated component, and tested disabled prop
+    test('verify that after changing the value of the two inputs, the button is enabled', async () => {
+        const wrapper = mount(<Login />);
+        const emailInput = wrapper.find({ id: 'email' });
+        const pwdInput = wrapper.find({ id: 'pwd' });
+
+        // Find the correct elements and activate their onchanges
+        emailInput.simulate('change', { target: { id: 'email', value: 'john.doe@email.com' } });
+        pwdInput.simulate('change', { target: { id: 'pwd', value: 'notapassword' } });
+        await flushPromises;
+        wrapper.update();
+        expect(wrapper.find({ type: 'submit' }).props().disabled).toBe(false);
+    });
+
+    // Test using State
+    it('verifies that the submit button is disabled by default', () => {
+        const wrapper = shallow(<Login />);
+        expect(wrapper.find('form #submit').props().disabled).toBe(true);
+    });
+
+});

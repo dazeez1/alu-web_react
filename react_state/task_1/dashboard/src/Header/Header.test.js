@@ -1,14 +1,25 @@
-import Header from "./Header";
-import { screen, render } from "@testing-library/react";
-import { StyleSheetTestUtils } from "aphrodite";
+import React from 'react';
+import { shallow } from 'enzyme';
+import Header from './Header';
+import { StyleSheetTestUtils } from 'aphrodite';
 
-StyleSheetTestUtils.suppressStyleInjection()
+beforeEach(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+});
 
-describe("Header", () => {
-  it("should render the correct header element", () => {
-    render(<Header />);
-    screen.getByRole("img");
-    // screen.getByText("School dashboard");
-    // screen.getByRole("heading");
-  });
+describe('<Header />', () => {
+    it('renders an <Header /> component', () => {
+        const wrapper = shallow(<Header />);
+        expect(wrapper).toHaveLength(1);
+    });
+
+    it('renders an <Header /> component checking for img', () => {
+        const wrapper = shallow(<Header />);
+        expect(wrapper.find('#Header img')).toHaveLength(1);
+    });
+
+    it('renders an <Header /> component checking for heading', () => {
+        const wrapper = shallow(<Header />);
+        expect(wrapper.find('#Header h1')).toHaveLength(1);
+    });
 });

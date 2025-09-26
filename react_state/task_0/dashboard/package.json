@@ -1,7 +1,7 @@
 {
-  "name": "task_5",
+  "name": "task_4",
   "version": "1.0.0",
-  "description": "task 5 of 0x02-react intro",
+  "description": "",
   "main": "./src/index.js",
   "jest": {
     "setupFilesAfterEnv": [
@@ -20,8 +20,7 @@
     "dev": "npm run start-dev -- --env mode=development",
     "prod": "npm run start-dev -- --env mode=production"
   },
-  "author": "Zac W",
-  "license": "ISC",
+
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/plugin-transform-runtime": "^7.16.0",
@@ -48,6 +47,7 @@
     "webpack-dev-server": "^4.4.0"
   },
   "dependencies": {
+    "aphrodite": "^2.4.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"

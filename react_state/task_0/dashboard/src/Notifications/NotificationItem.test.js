@@ -6,6 +6,11 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import NotificationItem from './NotificationItem';
 import Notifications from './Notifications';
+import { StyleSheetTestUtils } from 'aphrodite';
+
+beforeEach(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+});
 
 describe('<NotificationItem />', () => {
     it('renders an <NotificationItems /> component', () => {

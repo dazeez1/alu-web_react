@@ -1,51 +1,143 @@
-
-import React from "react";
-import { StyleSheet, css } from "aphrodite";
-
-export default function Login({ logIn }) {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const enableSubmit = email.length > 0 && password.length > 0;
-
-  const handleChangeEmail = (e) => {
-    setEmail(e.target.value);
-  }
-  const handleChangePassword = (e) => {
-    setPassword(e.target.value);
-  }
-
-  const handleLoginSubmit = (e) => {
-    console.log("click here")
-    e.preventDefault();
-    logIn(email, password)
-    
-  }
-
-  return (
-    <div className={css(styles.appBody)} data-testid="App-body">
-      <p className={css(styles.text)}>Login to access the full dashboard</p>
-      <form action="" onSubmit={handleLoginSubmit}>
-        <label htmlFor="email">
-          email:
-          <input type="email" onChange={handleChangeEmail} data-testid="email" id="email" />
-        </label>
-        <label htmlFor="password">
-          password:
-          <input onChange={handleChangePassword} type="password" data-testid="password" id="password" />
-        </label>
-        <button data-testid="submit-button" disabled={!enableSubmit} type="submit">ok</button>
-      </form>
-    </div>
-  );
-}
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, css, reset } from 'aphrodite';
 
 const styles = StyleSheet.create({
-  appBody: {
-    flex: 1,
-    paddingLeft: "60px",
-    margin: "20px",
-  },
-  text: {
-    fontSize: "32px",
-  },
+    /* App-body */
+    appBody: {
+        padding: '0px 32px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+
+    appBodyParagraph: {
+        fontWeight: 'bold',
+        marginBottom: '8px',
+    },
+
+    form: {
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        gap: '8px',
+        alignItems: 'flex-start',
+    },
+
+    formLabel: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignContent: 'center',
+        width: '100%',
+        alignItems: 'baseline',
+    },
+
+    appBodyLabelSpan: {
+        paddingLeft: '2px',
+        fontWeight: 'bold',
+        marginRight: '16px',
+    },
+
+    appBodyInput: {
+        /* display: block, */
+        height: '32px',
+        lineHeight: '16px',
+        fontSize: '16px',
+        paddingLeft: '2px',
+        marginTop: '2px',
+    },
+
+    appBodyButton: {
+        borderRadius: '25px',
+        width: '150px',
+        height: '32px',
+        backgroundColor: 'white', /* #ff4242 */
+        fontSize: '24px',
+        border: '.5px solid lightgrey',
+        alignSelf: 'center',
+    },
 });
+
+function Login({ logIn }) {
+    const [ email, setEmail ] = useState('');
+    const [ password, setPassword ] = useState('');
+    const [ enableSubmit, setEnableSubmit ] = useState(false);
+
+    function handleLoginSubmit(e) {
+        e.preventDefault();
+        logIn(email, password);
+        console.log('Logged in!');
+    }
+
+    function handleChangeEmail(e) {
+        setEmail(e.target.value);
+    }
+
+    // when email changes, check submit mode
+    useEffect(() => {
+        resetEnableSubmit();
+    }, [ email ]);
+
+    function handleChangePassword(e) {
+        setPassword(e.target.value);
+    }
+
+    // when password changes, check submit mode
+    useEffect(() => {
+        resetEnableSubmit();
+    }, [ password ]);
+
+    function resetEnableSubmit() {
+        if (email !== '' && password !== '') {
+            // disabled = false
+            setEnableSubmit(true);
+            return false;
+        } else {
+            // disabled = true
+            setEnableSubmit(false);
+            return true
+        }
+    }
+
+    return (
+        <div className={ css(styles.appBody) } id="Login">
+            <p className={ css(styles.appBodyParagraph) }>Login to access the full dashboard</p>
+            <form
+                className={ css(styles.form) }
+                onSubmit={ handleLoginSubmit }>
+                <label
+                    htmlFor="email"
+                    className={ css(styles.formLabel) }
+                >
+                    <span className={ css(styles.appBodyLabelSpan) }>Email:</span>
+                    <input
+                        className={ css(styles.appBodyInput) }
+                        type="email"
+                        name="email"
+                        id="email"
+                        onChange={ handleChangeEmail } />
+                </label>
+
+                <label htmlFor="password"
+                    className={ css(styles.formLabel) }>
+                    <span className={ css(styles.appBodyLabelSpan) }>Password:</span>
+                    <input
+                        className={ css(styles.appBodyInput) }
+                        type="password"
+                        name="password"
+                        id="pwd"
+                        onChange={ handleChangePassword } />
+                </label>
+
+                <input
+                    type='submit'
+                    id='submit'
+                    value='OK'
+                    className={ css(styles.appBodyButton) }
+                    disabled={ !enableSubmit }
+                    ></input>
+            </form>
+        </div>
+    );
+}
+
+export default Login;
